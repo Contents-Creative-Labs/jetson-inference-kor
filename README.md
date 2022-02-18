@@ -1,5 +1,5 @@
 * Auto: 김준호
-* Date: 2022-02-14
+* Date: 2022-02-18
 
 <img src="https://github.com/dusty-nv/jetson-inference/raw/master/docs/images/deep-vision-header.jpg" width="100%">
 
@@ -14,7 +14,7 @@ NVIDIA의 **[Jetson Nano/TX1/TX2/Xavier NX/AGX Xavier](http://www.nvidia.com/obj
 
 [Hello AI World](#hello-ai-world) 에서는 jetson platform에서 inference(추론)과 transfer learning을 하는 튜토리얼을 제공합니다. 여기서 직접 datasets을 수집하고 인공신경망을 직접 학습시켜볼 수 있습니다. 이 튜토리얼은 image classification(이미지 분류), object detection(객체 검출), sematic segmentation, pose estimation, mono depth를 다룹니다.
 
-### Table of Contents
+### 목차
 
 * [Hello AI World](#hello-ai-world)
 * [Video Walkthroughs](#video-walkthroughs)
@@ -24,9 +24,8 @@ NVIDIA의 **[Jetson Nano/TX1/TX2/Xavier NX/AGX Xavier](http://www.nvidia.com/obj
 * [System Requirements](#recommended-system-requirements)
 * [Change Log](CHANGELOG.md)
 
-> &gt; &nbsp; JetPack 4.6 is now supported, along with [updated containers](docs/aux-docker.md). <br/>
-> &gt; &nbsp; Try the new [Pose Estimation](docs/posenet.md) and [Mono Depth](docs/depthnet.md) tutorials! <br/>
-> &gt; &nbsp; See the [Change Log](CHANGELOG.md) for the latest updates and new features. <br/>
+> &gt; &nbsp; JetPack 4.6 이 지원됩니다. 문서를 확인하세요. [updated containers](docs/aux-docker.md). <br/>
+> &gt; &nbsp; [Pose Estimation](docs/posenet.md) 와 [Mono Depth](docs/depthnet.md) 튜토리얼을 해보세요! <br/>
 
 ## Hello AI World
 
@@ -87,7 +86,7 @@ Hello AI Wolrd는 jetson 보드에서 수행될 수 있으며, 이는 TensorRT�
 
 ## API Reference
 
-Below are links to reference documentation for the [C++](https://rawgit.com/dusty-nv/jetson-inference/dev/docs/html/index.html) and [Python](https://rawgit.com/dusty-nv/jetson-inference/dev/docs/html/python/jetson.html) libraries from the repo:
+아래 두 문서 링크는 [C++](https://rawgit.com/dusty-nv/jetson-inference/dev/docs/html/index.html) and [Python](https://rawgit.com/dusty-nv/jetson-inference/dev/docs/html/python/jetson.html) 해당 repo에서 사용하는 API 라이브러리입니다.
 
 #### jetson-inference
 
@@ -204,7 +203,7 @@ These examples will automatically be compiled while [Building the Project from S
 | Pose-ResNet18-Hand      | `resnet18-hand`    | `RESNET18_HAND`    | 21        |
 | Pose-DenseNet121-Body   | `densenet121-body` | `DENSENET121_BODY` | 18        |
 
-## Recommended System Requirements
+## 권장 사양
 
 * Jetson Nano Developer Kit with JetPack 4.2 or newer (Ubuntu 18.04 aarch64).  
 * Jetson Nano 2GB Developer Kit with JetPack 4.4.1 or newer (Ubuntu 18.04 aarch64).
@@ -216,7 +215,7 @@ These examples will automatically be compiled while [Building the Project from S
 The [Transfer Learning with PyTorch](#training) section of the tutorial speaks from the perspective of running PyTorch onboard Jetson for training DNNs, however the same PyTorch code can be used on a PC, server, or cloud instance with an NVIDIA discrete GPU for faster training.
 
 
-## Extra Resources
+## 추가 
 
 In this area, links and resources for deep learning are listed:
 
