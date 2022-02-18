@@ -26,7 +26,6 @@ Date: 2022-02-18<br>
 |------------------|--------------|---------------------------|----------------------------------------------------------|
 | [MIPI CSI camera](#mipi-csi-cameras) | `csi://`     | `csi://0`                 | CSI 카메라 0 (`0`을 다른 카메라 번호로 대체하세요.)    |
 | [V4L2 camera](#v4l2-cameras)     | `v4l2://`    | `v4l2:///dev/video0`      | V4L2 device 0 (`0`을 다른 카메라 번호로 대체하세요.)     |
-|
 | [RTP stream](#rtp)       | `rtp://`     | `rtp://@:1234`            | localhost, port 1234 (추가적인 configuration(구성) 필요) |
 | [RTSP stream](#rtsp)      | `rtsp://`    | `rtsp://<remote-ip>:1234` | `<remote-ip>` 를 원격 host의 ip나 hostname으로 대체하세요. |
 | [Video file](#video-files)       | `file://`    | `file://my_video.mp4`     | MP4, MKV, AVI, FLV 를 지원합니다. (아래 codecs를 확인하세요.)   |
