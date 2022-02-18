@@ -1,5 +1,5 @@
-trans: 김준호
-Date: 2022-02-18
+translated by: 김준호<br>
+Date: 2022-02-18<br>
 
 
 <img src="https://github.com/dusty-nv/jetson-inference/raw/master/docs/images/deep-vision-header.jpg" width="100%">
@@ -7,9 +7,9 @@ Date: 2022-02-18
 <br/>
 <sup>Appendix</sup></p>  
 
-# Camera Streaming and Multimedia
+# 카메라 스트리밍과 멀티미디어
 
-This project supports streaming video feeds and images via a variety of interfaces and protocols, including:
+해당 프로젝트는 아래 테이블과 같은 다양한 인터페이스와 프로토콜을 통해 비디오 피드와 이미지들을 스트리밍하는 것을 지원합니다.
 
 * [MIPI CSI cameras](#mipi-csi-cameras)
 * [V4L2 cameras](#v4l2-cameras)
@@ -18,22 +18,23 @@ This project supports streaming video feeds and images via a variety of interfac
 * [Image sequences](#image-files)
 * [OpenGL windows](#output-streams)
 
-Streams are identified via a resource URI and accessed through the [`videoSource`](#source-code) and [`videoOutput`](#source-code) APIs.  The tables below show the supported input/output protocols and example URIs for each type of stream:
+스트림들은 resource URI에 의해 구별되며 [`videoSource`](#source-code) 와 [`videoOutput`](#source-code) API들을 통해 접근할 수 있습니다. 아래 테이블에는 각 스트림의 타입에 대하여 지원되는 입출력 프로토콜들이 나와있습니다.
 
-### Input Streams
+### Input(입력) 스트림
 
 |                  | Protocol     | Resource URI              | Notes                                                    |
 |------------------|--------------|---------------------------|----------------------------------------------------------|
-| [MIPI CSI camera](#mipi-csi-cameras) | `csi://`     | `csi://0`                 | CSI camera 0 (substitute other camera numbers for `0`)                    |
-| [V4L2 camera](#v4l2-cameras)     | `v4l2://`    | `v4l2:///dev/video0`      | V4L2 device 0 (substitute other camera numbers for `0`)                            |
-| [RTP stream](#rtp)       | `rtp://`     | `rtp://@:1234`            | localhost, port 1234 (requires additional configuration) |
-| [RTSP stream](#rtsp)      | `rtsp://`    | `rtsp://<remote-ip>:1234` | Replace `<remote-ip>` with remote host's IP or hostname  |
-| [Video file](#video-files)       | `file://`    | `file://my_video.mp4`     | Supports loading MP4, MKV, AVI, FLV (see codecs below)   |
-| [Image file](#image-files)       | `file://`    | `file://my_image.jpg`     | Supports loading JPG, PNG, TGA, BMP, GIF, ect.           |
-| [Image sequence](#image-files)   | `file://`    | `file://my_directory/`    | Searches for images in alphanumeric order                |
+| [MIPI CSI camera](#mipi-csi-cameras) | `csi://`     | `csi://0`                 | CSI 카메라 0 (`0`을 다른 카메라 번호로 대체하세요.)    |
+| [V4L2 camera](#v4l2-cameras)     | `v4l2://`    | `v4l2:///dev/video0`      | V4L2 device 0 (`0`을 다른 카메라 번호로 대체하세요.)     |
 
-* Supported decoder codecs:  H.264, H.265, VP8, VP9, MPEG-2, MPEG-4, MJPEG
-* The `file://`, `v4l2://`, and `csi://` protocol prefixes can be omitted from the URI as shorthand
+| [RTP stream](#rtp)       | `rtp://`     | `rtp://@:1234`            | localhost, port 1234 (추가적인 configuration(구성) 필요) |
+| [RTSP stream](#rtsp)      | `rtsp://`    | `rtsp://<remote-ip>:1234` | `<remote-ip>` 를 원격 host의 ip나 hostname으로 대체하세요. |
+| [Video file](#video-files)       | `file://`    | `file://my_video.mp4`     | MP4, MKV, AVI, FLV 를 지원합니다. (아래 codecs를 확인하세요.)   |
+| [Image file](#image-files)       | `file://`    | `file://my_image.jpg`     | JPG, PNG, TGA, BMP, GIF, 등을 지원합니다.           |
+| [Image sequence](#image-files)   | `file://`    | `file://my_directory/`    | 알파벳 순으로 이미지를 탐색합니다.          |
+
+* 지원하는 디코더 codecs(코덱):  H.264, H.265, VP8, VP9, MPEG-2, MPEG-4, MJPEG
+* `file://`, `v4l2://`, 그리고 `csi://` 프로토콜의 prefix(접두사)들은 URI에서 생략할 수 있습니다.
 
 ### Output Streams
 
