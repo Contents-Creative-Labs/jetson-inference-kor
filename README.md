@@ -35,7 +35,7 @@ Hello AI Wolrd는 jetson 보드에서 수행될 수 있으며, 이는 TensorRT�
 
 * [Jetson 에 JetPack 설정하기](docs/jetpack-setup-2.md)
 * [Docker Container 실행시키기](docs/aux-docker.md)
-* [소스코드에서부터 프로젝트 설계하기](docs/building-repo-2.md)
+* [소스코드로 build(빌드)하기](docs/building-repo-2.md)
 
 #### Inference(추론)
 
@@ -67,9 +67,9 @@ Hello AI Wolrd는 jetson 보드에서 수행될 수 있으며, 이는 TensorRT�
 
 #### Appendix
 
-* [Camera Streaming and Multimedia](docs/aux-streaming.md)
-* [Image Manipulation with CUDA](docs/aux-image.md)
-* [Deep Learning Nodes for ROS/ROS2](https://github.com/dusty-nv/ros_deep_learning)
+* [카메라 스트리밍과 멀티 미디어](docs/aux-streaming.md)
+* [CUDA로 이미지 다루기](docs/aux-image.md)
+* [ROS/ROS2용 딥러닝 노드](https://github.com/dusty-nv/ros_deep_learning)
 
 ## Video 목록
 
