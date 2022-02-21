@@ -1,5 +1,5 @@
 translated by: 김준호<br>
-Date: 2022-02-18<br>
+Date: 2022-02-21<br>
 
 
 <img src="https://github.com/dusty-nv/jetson-inference/raw/master/docs/images/deep-vision-header.jpg" width="100%">
@@ -149,11 +149,10 @@ $ video-viewer /dev/video0 rtp://<remote-ip>:1234 # broadcast output stream over
 
 #### V4L2 포맷
 
-기본값으로, V4L2 카메라는 
+기본적으로, V4L2 카메라는 지정된 해상도 중 (1280x720이 기본값) 가장 높은 FPS를 선택하여 이들의 카메라 포맷으로 생성됩니다. 가장 높은 FPS를 갖는 포맷은 H.264나 MJPEG으로 인코드 될 수 있습니다. 왜냐하면 USB 카메라는 보통 압축되지 않은 YUV/RGB 영상을 전송할 때 낮은 FPS로 전송되기 때문입니다. 이러한 경우에, 해당 코덱은 이를 감지하고, 높은 FPS를 얻기 위해 Jetson의 하드웨어 디코더를 이용하여 카메라 스트림을 자동으로 디코딩합니다.
 
-By default, V4L2 cameras will be created using the camera format with the highest framerate that most closely matches the desired resolution (by default, that resolution is 1280x720).  The format with the highest framerate may be encoded (for example with H.264 or MJPEG), as USB cameras typically transmit uncompressed YUV/RGB at lower framerates.  In this case, that codec will be detected and the camera stream will automatically be decoded using the Jetson's hardware decoder to attain the highest framerate.
-
-If you explicitly want to choose the format used by the V4L2 camera, you can do so with the `--input-width`, `--input-height`, and `--input-codec` options.  Possible decoder codec options are `--input-codec=h264, h265, vp8, vp9, mpeg2, mpeg4, mjpeg`
+만약 명시적으로 V4L2가 사용할 포맷을 선택하고 싶다면, `--input-width`, `--input-height`, 와 `--input-codec` 옵션을 사용하여 이와 같이 할 수 있습니다.
+가능한 디코더 옵션은 다음과 같습니다. `--input-codec=h264, h265, vp8, vp9, mpeg2, mpeg4, mjpeg`
 
 ```bash
 $ video-viewer --input-width=1920 --input-height=1080 --input-codec=h264 /dev/video0
