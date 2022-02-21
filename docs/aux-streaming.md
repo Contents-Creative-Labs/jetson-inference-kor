@@ -45,38 +45,38 @@ Date: 2022-02-18<br>
 | [Image sequence](#image-files)   | `file://`    | `file://image_%i.jpg`     | `%i` is replaced by the image number in the sequence     |
 | [OpenGL window](#output-streams)   | `display://` | `display://0`             | Creates GUI window on screen 0                           |
 
-* Supported encoder codecs:  H.264, H.265, VP8, VP9, MJPEG
-* The `file://` protocol prefixes can be omitted from the URI as shorthand
-* By default, an OpenGL display window will be created unless `--headless` is specified
+* 지원하는 인코더 (codecs)코덱:  H.264, H.265, VP8, VP9, MJPEG
+* `file://` 프로토콜의 prefixes(접미사)는 URI에서 생략될 수 있습니다.
+* By default(기본값으로), OpenGL 디스플레이 윈도우는 `--headless` 옵션을 명시하지 않으면 항상 생성됩니다.
 
-## Command-Line Arguments
+## 커맨드 라인 인자
 
-Each example C++ and Python program from jetson-inference accepts the same set of command-line arguments for specifying stream URIs and additional options. So these options can be used on any of the examples (e.g. [`imagenet`](../examples/imagenet/imagenet.cpp)/[`imagenet.py`](../examples/python/imagenet.py), [`detectnet`](../examples/detectnet/detectnet.cpp)/[`detectnet.py`](../examples/python/detectnet.py), [`segnet`](../examples/segnet/segnet.cpp)/[`segnet.py`](../examples/python/segnet.py), [`video-viewer`](https://github.com/dusty-nv/jetson-utils/tree/master/video/video-viewer/video-viewer.cpp)/[`video-viewer.py`](https://github.com/dusty-nv/jetson-utils/tree/master/python/examples/video-viewer.py), ect).  These command-line arguments generally take the form:
+jetson-inference의 각 C++, Python 예제 프로그램들은 스트림 URI와 추가적인 옵션을 위해 같은 커맨드 라인 인자들의 셋을 받습니다. 따라서 해당 옵션들은 어떤한 예제들에서도 사용이 가능합니다. (e.g. [`imagenet`](../examples/imagenet/imagenet.cpp)/[`imagenet.py`](../examples/python/imagenet.py), [`detectnet`](../examples/detectnet/detectnet.cpp)/[`detectnet.py`](../examples/python/detectnet.py), [`segnet`](../examples/segnet/segnet.cpp)/[`segnet.py`](../examples/python/segnet.py), [`video-viewer`](https://github.com/dusty-nv/jetson-utils/tree/master/video/video-viewer/video-viewer.cpp)/[`video-viewer.py`](https://github.com/dusty-nv/jetson-utils/tree/master/python/examples/video-viewer.py), ect). 커맨드 라인 인자들은 보통 다음과 같은 폼을 갖습니다.:
 
 ```bash
 $ imagenet [options] input_URI [output_URI]  # output URI is optional
 ```
 
-where the input and output URIs are specified by two positional arguments.  For example:
+다음은 input, output URI가 두 개의 positional arguments(위치 인자)로 주어진 것입니다.:
 
 ```bash
 $ imagenet input.jpg output.jpg              # classify input.jpg, save as output.jpg
 ```
 
-As mentioned above, any of the examples from jetson-inference can be substituted here, since they use the same command-line parsing.  Below are additional stream options that can be specified when running each program:
+위에서 언급하였듯이, 같은 커맨드 라인 파싱을 사용한다면 jetson-inference의 어떤 예제라도 이와 같이 대체될 수 있습니다. 아래는 각 프로그램을 수행할 때 사용할 수 있는 추가 스트림 옵션들입니다.
 
-#### Input Options
+#### Input(입력) 옵션
 
 ```
-    input_URI            resource URI of the input stream (see table above)
-  --input-width=WIDTH    explicitly request a resolution of the input stream
-  --input-height=HEIGHT  (resolution is optional, except required for RTP)
-  --input-codec=CODEC    RTP requires the codec to be set, one of these:
+    input_URI            input(입력) 스트림의 리소스 URI (위 테이블을 확인하세요)
+  --input-width=WIDTH    명시적으로 입력 스트림의 해상도를 요청 
+  --input-height=HEIGHT  (해상도 선택은 옵션, RTP는 필요함)
+  --input-codec=CODEC    RTP 아래 코덱중 하나를 사용하도록 설정해야합니다.:
                              * h264, h265
                              * vp8, vp9
                              * mpeg2, mpeg4
                              * mjpeg
-  --input-flip=FLIP      flip method to apply to input (excludes V4L2):
+  --input-flip=FLIP      input에 적용할 flip method (V4L2 제외):
                              * none (default)
                              * counterclockwise
                              * rotate-180
@@ -85,13 +85,13 @@ As mentioned above, any of the examples from jetson-inference can be substituted
                              * vertical
                              * upper-right-diagonal
                              * upper-left-diagonal
-  --input-loop=LOOP      for file-based inputs, the number of loops to run:
-                             * -1 = loop forever
-                             *  0 = don't loop (default)
-                             * >0 = set number of loops
+  --input-loop=LOOP      파일에 기반한 입력일 때, 반복 수행할 횟수:
+                             * -1 = 무한 반복
+                             *  0 = 반복 안함 (기본값)
+                             * >0 = 반복 횟수 설정
   --input-rtsp-latency=2000
-                         Number of milliseconds to buffer of an incoming RTSP 
-                             stream. Setting it to zero can give very low 
+                         들어오는 RTSP 스트림을 버퍼할 milliseconds. 
+                              Setting it to zero can give very low 
                              delay, but may result in jitter depending on 
                              network performance.
 ```
