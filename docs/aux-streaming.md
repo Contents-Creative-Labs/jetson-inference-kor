@@ -91,36 +91,36 @@ $ imagenet input.jpg output.jpg              # classify input.jpg, save as outpu
                              * >0 = 반복 횟수 설정
   --input-rtsp-latency=2000
                          들어오는 RTSP 스트림을 버퍼할 milliseconds. 
-                              Setting it to zero can give very low 
-                             delay, but may result in jitter depending on 
-                             network performance.
+                             해당 옵션값을 0으로 주면 딜레이가 거의 발생하지 않지만,
+			     네트워크 상태에 따라 끊김 현상이 발생할 수 있습니다.
 ```
 
-#### Output Options
+#### Output(출력) 옵션
 
 ```
-    output_URI           resource URI of the output stream (see table above)
-  --output-codec=CODEC   desired codec for compressed output streams:
+    output_URI           출력 스트림의 리소스 URI (위 테이블을 확인하세요.)
+  --output-codec=CODEC   출력 스트림에 사용하고자 하는 코덱:
                             * h264 (default), h265
                             * vp8, vp9
                             * mpeg2, mpeg4
                             * mjpeg
-  --bitrate=BITRATE      desired target VBR bitrate for compressed streams,
-                         in bits per second. The default is 4000000 (4 Mbps)
-  --headless             don't create a default OpenGL GUI window
+  --bitrate=BITRATE      bps, 스트림의 VBR bitrate 
+                         기본값은 4000000 (4 Mbps)
+  --headless             기본 OpenGL GUI 윈도우를 생성하지 않음.
 ```
 
-Below are example commands of launching the `video-viewer` tool on various types of streams.  You can substitute the other programs for `video-viewer` in these commands, since they parse the same arguments.  In the [Source Code](#source-code) section of this page, you can browse the contents of the `video-viewer` source code to show how to use the `videoSource` and `videoOutput` APIs in your own applications.
+아래는 여러 종류의 스트림으로 `video-viewer` 명령어를 수행한 예제입니다. 인자들만 동일하다면 파싱 방법이 동일하기 때문에 `video-viewer` 대신에 다른 명령어들로 대체하여 수행 시켜볼 수도 있습니다. 해당 페이지의 [Source Code](#source-code) 섹션에서 자신의 어플리케이션에서 `videoSource` 와 `videoOutput` API를 어떻게 사용할지 보기 위해 `video-viewer` 소스 코드의 컨텐츠를 검색해볼 수도 있습니다.
 
-## MIPI CSI cameras
 
-MIPI CSI cameras are compact sensors that are acquired directly by the Jetson's hardware CSI/ISP interface.  Supported CSI cameras include:
+## MIPI CSI 카메라
+
+MIPI CSI 카메라는 작은 소형 센서 카메라입니다. 그리고 이는 jetson의 하드웨어의 CSI/ISP 인터페이스에 연결하여 사용할 수 있습니다. 지원되는 카메라는 아래와 같습니다.:
 
 * [Raspberry Pi Camera Module v2](https://www.raspberrypi.org/products/camera-module-v2/) (IMX219) for Jetson Nano and Jetson Xavier NX
 * OV5693 camera module from the Jetson TX1/TX2 devkits.  
 * See the [Jetson Partner Supported Cameras](https://developer.nvidia.com/embedded/jetson-partner-supported-cameras) page for more sensors supported by the ecosystem.
 
-Here's a few examples of launching with a MIPI CSI camera.  If you have multiple CSI cameras attached, subsitute the camera number for 0:
+아래는 MIPI CSI 카메라를 구동하는 예제입니다. 만약 여러 대의 카메라가 연결돼있다면 카메라의 번호 0 대신 다른 번호를 넣으면 됩니다.:
 
 ```bash
 $ video-viewer csi://0                        # MIPI CSI camera 0 (substitue other camera numbers)
@@ -128,15 +128,15 @@ $ video-viewer csi://0 output.mp4             # save output stream to MP4 file (
 $ video-viewer csi://0 rtp://<remote-ip>:1234 # broadcast output stream over RTP to <remote-ip>
 ```
 
-By default, CSI cameras will be created with a 1280x720 resolution.  To specify a different resolution, use the `--input-width` and `input-height` options.  Note that the specified resolution must match one of the formats supported by the camera.
+기본값으로, CSI 카메라는 1280x720 의 해상도로 생성됩니다. 다른 해상도를 사용하기 위해선 `--input-width` 와 `input-height` 옵션을 사용할 수 있습니다. 주의할 점은 직접 지정한 해상도가 카메라가 지원하는 포맷중 하나의 것과 일치하도록 값을 설정해야 한다는 것입니다. 
 
 ```bash
 $ video-viewer --input-width=1920 --input-height=1080 csi://0
 ```
 
-## V4L2 cameras
+## V4L2(USB) 카메라
 
-USB webcams are most commonly supported as V4L2 devices, for example Logitech [C270](https://www.logitech.com/en-us/product/hd-webcam-c270) or [C920](https://www.logitech.com/en-us/product/hd-pro-webcam-c920).
+USB 웹캠은 대부분 주로 V4L2 장치 형태로 지원됩니다. 예로 Logitech [C270](https://www.logitech.com/en-us/product/hd-webcam-c270) or [C920](https://www.logitech.com/en-us/product/hd-pro-webcam-c920) 같은 카메라가 있습니다.
 
 ```bash
 $ video-viewer v4l2:///dev/video0                 # /dev/video0 can be replaced with /dev/video1, ect.
@@ -145,9 +145,11 @@ $ video-viewer /dev/video0 output.mp4             # save output stream to MP4 fi
 $ video-viewer /dev/video0 rtp://<remote-ip>:1234 # broadcast output stream over RTP to <remote-ip>
 ```
 
-> **note:**  if you have a MIPI CSI camera plugged in, it will also show up as `/dev/video0`.  Then if you plug in a USB webcam, that would show up as `/dev/video1`, so you would want to substitue `/dev/video1` in the commands above.  Using CSI cameras through V4L2 is unsupported in this project, because through V4L2 they use raw Bayer without ISP (instead, use CSI cameras as shown [above](#mipi-csi-cameras)).
+> **주의:**  만얄 MIPI CSI 카메라가 연결돼있다면, 이는 `/dev/video0` 로 연결이 돼있습니다. 그럴 때 만약 USB 웹캠도 연결돼 있다면, 이는  `/dev/video1` 으로 나타납니다. 따라서 V4L2 카메라를 사용하기 위해선 위 예제 커맨드 라인을 `/dev/video1` 로 적절히 대체하여 수행해야 합니다. CSI 카메라를 V4L2로 사용하는 것은 해당 프로젝트에서 지원하지 않습니다. V4L2에서 ISP를 사용하지 않고 raw Bayer를 사용하기 때문입니다. (CSI 카메라를 사용하려면 [위](#mipi-csi-cameras)를 참고하세요. 
 
-#### V4L2 Formats
+#### V4L2 포맷
+
+기본값으로, V4L2 카메라는 
 
 By default, V4L2 cameras will be created using the camera format with the highest framerate that most closely matches the desired resolution (by default, that resolution is 1280x720).  The format with the highest framerate may be encoded (for example with H.264 or MJPEG), as USB cameras typically transmit uncompressed YUV/RGB at lower framerates.  In this case, that codec will be detected and the camera stream will automatically be decoded using the Jetson's hardware decoder to attain the highest framerate.
 
