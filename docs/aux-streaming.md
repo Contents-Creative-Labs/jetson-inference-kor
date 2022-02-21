@@ -158,7 +158,8 @@ $ video-viewer /dev/video0 rtp://<remote-ip>:1234 # broadcast output stream over
 $ video-viewer --input-width=1920 --input-height=1080 --input-codec=h264 /dev/video0
 ```
 
-When you run one of the jetson-inference programs on a V4L2 source, the different formats that the V4L2 camera supports will be logged to the terminal.  However you can also list these supported formats with the `v4l2-ctl` command:
+V4L2 소스를 이용하여 jetson-inference 프로그램들 중 하나를 실행할 때 V4L2 카메라가 지원하는 다른 포맷드이 터미널에 로깅됩니다. 그렇지만 `v4l2-ctl` 명령어를 통해서고 지원하는 해당 리스트들을 터미널에 출력할 수 있습니다.:
+
 
 ```bash
 $ sudo apt-get install v4l-utils
