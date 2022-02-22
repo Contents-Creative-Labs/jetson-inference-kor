@@ -190,10 +190,10 @@ RTP를 출력하고 있다면 해당 스트림이 송신될 원격 호스트의 
 
 #### 원격으로 RTP (view)보기
 
-If your Jetson is transmitting RTP to another remote host (like a PC), here are some example commands that you can use to view the stream:
+다른 원격 호스트 (PC)로 Jetson이 RTP를 송신하고 있다면, 해당 스트림을 보기 위한 커맨드 라인이 아래에 있습니다.: 
 
-* Using GStreamer:
-	* [Install GStreamer](https://gstreamer.freedesktop.org/documentation/installing/index.html) and run this pipeline (replace `port=1234` with the port you are using)
+* GStreamer 사용:
+	* [GStreamer 설치](https://gstreamer.freedesktop.org/documentation/installing/index.html)를 하고 해당 파이프라인을 수행시킵니다. (replace `port=1234` 를 실제로 사용할 포트번호로 바꿉니다.)
 	
 	```bash
 	$ gst-launch-1.0 -v udpsrc port=1234 \
@@ -201,8 +201,8 @@ If your Jetson is transmitting RTP to another remote host (like a PC), here are 
 	rtph264depay ! decodebin ! videoconvert ! autovideosink
 	```
 	
-* Using VLC Player:
-	* Create a SDP file (.sdp) with the following contents (replace `1234` with the port you are using)
+* VLC 플레이어 사용:
+	* SDP file (.sdp) 을 아래 내용으로 생성합니다. (`1234`를 실제로 사용할 포트번호로 대체합니다.)
 	
 	```
      c=IN IP4 127.0.0.1
@@ -210,11 +210,10 @@ If your Jetson is transmitting RTP to another remote host (like a PC), here are 
      a=rtpmap:96 H264/90000
 	```
 	
-	* Open the stream in VLC by double-clicking the SDP file
-	* You may want to reduce the `File caching` and `Network caching` settings in VLC as [shown here](https://www.howtogeek.com/howto/windows/fix-for-vlc-skipping-and-lagging-playing-high-def-video-files/)
+	* SDP file을 더블 클릭하여 스트림을 엽니다.
+	* `File caching` 과 `Network caching`를 줄이고 싶을 수 있는데 [shown here](https://www.howtogeek.com/howto/windows/fix-for-vlc-skipping-and-lagging-playing-high-def-video-files/)와 같이 VLC를 셋팅할 수 있습니다.
 	
-* If your remote host is another Jetson:
-	* Use the same `video-viewer` command as [above](#rtp) (replace `1234` with the port you are using)
+* 만약 호스트 기기가 다른 젯슨이라면 아래와 같이 수행해볼 수 있습니다.:
 	
 	```bash
 	$ video-viewer --input-codec=h264 rtp://@:1234
