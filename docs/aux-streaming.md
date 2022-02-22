@@ -168,27 +168,27 @@ $ v4l2-ctl --device=/dev/video0 --list-formats-ext
   
 ## RTP
 
-RTP network streams are broadcast to a particular host or multicast group over UDP/IP.  When recieving an RTP stream, the codec must be specified (`--input-codec`), because RTP doesn't have the ability to dynamically query this.  This will use RTP as input from another device:
+RTP 네트워크 스트림은 UDP/IP 상에서 특정 호스트나 멀티캐스트 그룹으로 브로드캐스트됩니다. RTP 스트림을 수신할 때 반드시 코덱을 명시적으로 알려줘야합니다 (`--input-codec`). 왜냐하면 RTP는 이를 자동으로 쿼리하지 못하기 때문입니다. 이는 다른 디바이스로부터 RTP를 입력으로 사용합니다.:
 
 ```bash
 $ video-viewer --input-codec=h264 rtp://@:1234         # recieve on localhost port 1234
 $ video-viewer --input-codec=h264 rtp://224.0.0.0:1234 # subscribe to multicast group
 ```
 
-The commands above specify RTP as the input source, where another remote host on the network is streaming to the Jetson.  However, you can also output an RTP stream from your Jetson and transmit it to another remote host on the network.
+위 커맨드 라인들은 RTP를 입력 소스로 명시하고, 여기서 네트워크의 다른 원격 호스트가 Jetson으로 스트리밍합니다. 또한 Jetson으로 부터 RTP 스트림을 output(출력)할 수 있으며 네트워크 상의 다른 원격 호스트에게도 송신할 수 있습니다.
 
-#### Transmitting RTP
+#### RTP 송신
 
-To transmit an RTP output stream, specify the target IP/port as the `output_URI`. If desired, you can specify the bitrate (the default is `--bitrate=4000000` or 4Mbps) and/or the output codec (the default is `--output-codec=h264`) which can be `h264, h265, vp8, vp9, mjpeg`
+RTP 출력 스트림을 송신하기 위해선 `output_URI`에 타겟 IP/포트 를 명시해야합니다. 만약 필요하다면 비트레이트나 출력 코덱을 명시할 수 있습니다. (비트레이트의 기본값은 `--bitrate=4000000` , 4Mbps) 이며, (코덱의 기본값은 `--output-codec=h264`)입니다. 이는 `h264, h265, vp8, vp9, mjpeg`들의 코덱으로도 사용할 수 있습니다.
 
 ```bash
 $ video-viewer --bitrate=1000000 csi://0 rtp://<remote-ip>:1234         # transmit camera over RTP, encoded as H.264 @ 1Mbps 
 $ video-viewer --output-codec=h265 my_video.mp4 rtp://<remote-ip>:1234  # transmit a video file over RTP, encoded as H.265
 ```
 
-When outputting RTP, you need to explicitly set the IP address or hostname of the remote host (or multicast group) that the stream is being sent to (shown above as `<remote-ip>`).  See below for some pointers on viewing the RTP stream from a PC.
+RTP를 출력하고 있다면 해당 스트림이 송신될 원격 호스트의 IP 주소나 호스트 이름을 명시적으로 설정해야합니다. (위에서는 `<remote-ip>`와 같이 사용합니다.) PC에서 RTP 스트림을 보기 위한 몇가지 포인트들을 살펴봅시다. 
 
-#### Viewing RTP Remotely
+#### 원격으로 RTP (view)보기
 
 If your Jetson is transmitting RTP to another remote host (like a PC), here are some example commands that you can use to view the stream:
 
