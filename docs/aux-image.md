@@ -27,15 +27,13 @@
 * [오버레이(Overlay)](#overlay)
 * [도형 그리기(Drawing Shapes)](#drawing-shapes)
 
+이와 같은 함수를 사용하는 예제를 위해 아래 psuedocode 외에 추가적으로 [`cuda-examples.py`](https://github.com/dusty-nv/jetson-utils/tree/master/python/examples/cuda-examples.py) 를 살펴보세요. 이 페이지를 살펴보기 전에 비디오 캡쳐, 출력, 이미지 불러오기, 저장 등에 대한 정보를 이전 페이지인 [Camera Streaming and Multimedia](aux-streaming.md) 를 살펴보고 오시기를 권장드립니다. 
 
+## 이미지 포맷(formats)
 
-For examples of using these functions, see [`cuda-examples.py`](https://github.com/dusty-nv/jetson-utils/tree/master/python/examples/cuda-examples.py) in addition to the psuedocode below.  Before diving in here, it's recommended to read the previous page on [Camera Streaming and Multimedia](aux-streaming.md) for info about video capture and output, loading/saving images, ect.
+[video streaming](aux-streaming#source-code) API나 딥러닝 객체(가령, [`imageNet`](c/imageNet.h), [`detectNet`](c/detectNet.h), and [`segNet`](c/segNet.h))들은 RGB/RGBA 이미지의 포맷을 입력으로 받기를 기대하지만, 이미지 획득(sensor acquisition)이나 저수준I/O 를 위한 다양한 다른 포맷들이 정의돼있습니다.:
 
-## Image Formats
-
-Although the [video streaming](aux-streaming#source-code) APIs and DNN objects (such [`imageNet`](c/imageNet.h), [`detectNet`](c/detectNet.h), and [`segNet`](c/segNet.h)) expect images in RGB/RGBA format, a variety of other formats are defined for sensor acquisition and low-level I/O:  
-
-|                 | Format string | [`imageFormat` enum](https://rawgit.com/dusty-nv/jetson-inference/dev/docs/html/group__imageFormat.html#ga931c48e08f361637d093355d64583406)   | Data Type | Bit Depth |
+|                 | 포맷 스트링 | [`imageFormat` enum](https://rawgit.com/dusty-nv/jetson-inference/dev/docs/html/group__imageFormat.html#ga931c48e08f361637d093355d64583406)   | 데이터 타입 | 비트 수 |
 |-----------------|---------------|--------------------|-----------|-----------|
 | **RGB/RGBA**    | `rgb8`        | `IMAGE_RGB8`       | `uchar3`  | 24        |
 |                 | `rgba8`       | `IMAGE_RGBA8`      | `uchar4`  | 32        |
@@ -58,22 +56,22 @@ Although the [video streaming](aux-streaming#source-code) APIs and DNN objects (
 |                 | `bayer-rggb`  | `IMAGE_BAYER_RGGB` | `uint8`   | 8         |
 | **Grayscale**   | `gray8`       | `IMAGE_GRAY8`      | `uint8`   | 8         |
 |                 | `gray32f`     | `IMAGE_GRAY32F`    | `float`   | 32        |
-* The bit depth represents the effective number of bits per pixel
-* For detailed specifications of the YUV formats, refer to [fourcc.org](http://fourcc.org/yuv.php)
+* 비트 수는 각 픽셀에 효과적인 비트 수를 나타냅니다.
+* YUV 포맷의 구체적은 스펙은 다음 페이지를 참고하세요. [fourcc.org](http://fourcc.org/yuv.php)
 
-> **note:** in C++, the RGB/RGBA formats are the only ones that should be used with the `uchar3`/`uchar4`/`float3`/`float4` vector types.  It is assumed that when these types are used, the images are in RGB/RGBA format.
+> **note:** C++에서 RGB/RGBA는 꼭 `uchar3`/`uchar4`/`float3`/`float4` 벡터 타입을 사용해야하는 유일한 포맷입니다. 나열된 타입들이 사용되면 주어진 이미지는 RGB/RGBA로 간주되기 때문입니다.
 
-To convert images between data formats and/or colorspaces, see the [Color Conversion](#color-conversion) section below.
+이미지의 데이터 포맷과 색공간(colorspace)를 변환하고 싶다면, 아래 [Color Conversion](#color-conversion) 섹션을 확인하세요.
 
-## Image Allocation
+## 이미지 할당 (Allocation)
+중간 과정, 결과 이미지를 저장하기 위해 (i.e. 이미지를 처리할 때 사용할 working 메모리) 빈 GPU 메모리를 할당하기 위해서는 C++이나 Python 으로 작성된 [`cudaAllocMapped()`](https://github.com/dusty-nv/jetson-utils/tree/master/cuda/cudaMappedMemory.h) 중 하나의 함수를 사용하세요. [`videoSource`](aux-streaming#source-code)의 입력 스트립은 자동으로 사용할 메모리를 GPU에 할당해놓습니다. 그리고 해당 메모리에 남아있는 이미지를 그대로 반환합니다. 따라서 이를 위해 메모리를 따로 할당할 필요가 없습니다.
 
-To allocate empty GPU memory for storing intermediate/output images (i.e. working memory during processing), use one of the [`cudaAllocMapped()`](https://github.com/dusty-nv/jetson-utils/tree/master/cuda/cudaMappedMemory.h) functions from C++ or Python.  Note that the [`videoSource`](aux-streaming#source-code) input streams automatically allocate their own GPU memory, and return to you the latest image, so you needn't allocate your own memory for those.  
+[`cudaAllocMapped()`](https://github.com/dusty-nv/jetson-utils/tree/master/cuda/cudaMappedMemory.h) 에 의해 할당된 메모리는 shared CPU/GPU 메모리 공간에 할당됩니다.
+따라서 CPU, GPU 사이에 메모리를 복사하지 않더라도 CPU, GPU 어디에서든 해당 이미지에 접근할 수 있습니다. (이를 그래서 ZeroCopy 메모리 라고도 합니다.)
 
-Memory allocated by [`cudaAllocMapped()`](https://github.com/dusty-nv/jetson-utils/tree/master/cuda/cudaMappedMemory.h) resides in a shared CPU/GPU memory space, so it is accessible from both the CPU and GPU without needing to perform a memory copy between them (hence it is also referred to as ZeroCopy memory).  
+반면 동기화(Synchronization)이 필요합니다. GPU 연산을 한 이후, CPU에서 해당 이미지에 접근하고 싶다면 먼저 [`cudaDeviceSynchronize()`](https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__DEVICE.html#group__CUDART__DEVICE_1g10e20b05a95f638a4071a655503df25d) 함수를 호출해야합니다. C++에서 메모리를 free 하고 싶다면, [`cudaFreeHost()`](https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html#group__CUDART__MEMORY_1g71c078689c17627566b2a91989184969) 함수를 사용하세요. Python에서는 메모리가 자동으로 가비지 컬렉터에 의해 반환되겠지만 명시적으로 메모리를 반환하려면 `del` 을 사용하세요.
 
-Synchronization is required however - so if you want to access an image from the CPU after GPU processing has occurred, call [`cudaDeviceSynchronize()`](https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__DEVICE.html#group__CUDART__DEVICE_1g10e20b05a95f638a4071a655503df25d) first.  To free the memory in C++, use the [`cudaFreeHost()`](https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html#group__CUDART__MEMORY_1g71c078689c17627566b2a91989184969) function.  In Python, the memory will automatically be released by the garbage collector, but you can free it explicitly with the `del` operator.  
-
-Below is Python and C++ psuedocode for allocating/synchronizing/freeing the ZeroCopy memory:
+아래 psuedocode는 ZeroCopy 메모리를 할당/동기화/해제 하는 예제입니다.
 
 #### Python
 ```python
@@ -112,7 +110,7 @@ CUDA(cudaDeviceSynchronize());
 CUDA(cudaFreeHost(img));
 ```
 
-In C++, you can often omit the explicit [`imageFormat`](#image-formats) enum if your pointers are typed as `uchar3/uchar4/float3/float4`.  Below is functionaly equivalent to the allocation above:
+C++에서는 포인터의 타입을 `uchar3/uchar4/float3/float4` 와 같이 선언한다면 명시적인 [`imageFormat`](#image-formats) 을 생략할 수 있습니다. 아래 코드는 위의 할당 예제와 정확히 일치하는 코드 예제입니다.:
 
 ```cpp
 uchar3* img = NULL;	// can be uchar3 (rgb8), uchar4 (rgba8), float3 (rgb32f), float4 (rgba32f)
