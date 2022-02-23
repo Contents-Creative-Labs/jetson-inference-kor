@@ -1,28 +1,33 @@
+* Auth: 김준호
+* Data: 2022-02-23
+
 <img src="https://github.com/dusty-nv/jetson-inference/raw/master/docs/images/deep-vision-header.jpg" width="100%">
 <p align="right"><sup><a href="aux-streaming.md">Back</a> | <a href="https://github.com/dusty-nv/ros_deep_learning">Next</a> | </sup><a href="../README.md#hello-ai-world"><sup>Contents</sup></a>
 <br/>
 <sup>Appendix</sup></p>  
 
-# Image Manipulation with CUDA
+# CUDA로 이미지 다루기
 
-This page covers a number of image format, conversion, and pre/post-processing functions implemented by jetson-utils with CUDA:
+해당 페이지는 CUDA와 함께 구현된 jetson-util의 여러가지의 이미지 포맷, 변환, pre/post-processing(전/후처리) 함수를 다룹니다.
 
-**Image Management**
-* [Image Formats](#image-formats)
-* [Image Allocation](#image-allocation)
-* [Copying Images](#copying-images)
-* [Image Capsules in Python](#image-capsules-in-python)
-	* [Accessing Image Data in Python](#accessing-image-data-in-python)
-	* [Converting to Numpy Arrays](#converting-to-numpy-arrays)
-	* [Converting from Numpy Arrays](#converting-from-numpy-arrays)
+**이미지 매니지먼트**
+* [이미지 포맷(formats)](#image-formats)
+* [이미지 할당(allocation)](#image-allocation)
+* [이미지 복사(copy)](#copying-images)
+* [Python에서의 이미지 캡슐](#image-capsules-in-python)
+	* [Python에서 이미지 데이터에 접근(access)](#accessing-image-data-in-python)
+	* [Numpy 배열로 변환 (to numpy)](#converting-to-numpy-arrays)
+	* [Numpy 배열을 변환 (from numpy)](#converting-from-numpy-arrays)
 
-**CUDA Routines**
-* [Color Conversion](#color-conversion)
-* [Resizing](#resizing)
-* [Cropping](#cropping)
-* [Normalization](#normalization)
-* [Overlay](#overlay)
-* [Drawing Shapes](#drawing-shapes)
+**CUDA 루틴**
+* [컬러 변환](#color-conversion)
+* [크기 변환](#resizing)
+* [이미지 자르기(Cropping)](#cropping)
+* [이미지 정규화(Normalization)](#normalization)
+* [오버레이(Overlay)](#overlay)
+* [도형 그리기(Drawing Shapes)](#drawing-shapes)
+
+
 
 For examples of using these functions, see [`cuda-examples.py`](https://github.com/dusty-nv/jetson-utils/tree/master/python/examples/cuda-examples.py) in addition to the psuedocode below.  Before diving in here, it's recommended to read the previous page on [Camera Streaming and Multimedia](aux-streaming.md) for info about video capture and output, loading/saving images, ect.
 
