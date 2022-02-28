@@ -1,5 +1,5 @@
 translated by: 김준호<br>
-Date: 2022-02-21<br>
+Date: 2022-02-27<br>
 
 
 <img src="https://github.com/dusty-nv/jetson-inference/raw/master/docs/images/deep-vision-header.jpg" width="100%">
@@ -221,18 +221,18 @@ RTP를 출력하고 있다면 해당 스트림이 송신될 원격 호스트의 
 
 ## RTSP
 
-RTSP network streams are subscribed to from a remote host over UDP/IP.  Unlike RTP, RTSP can dynamically query the stream properties (like resolution and codec), so these options don't need to be explicitly provided.
+RTSP 네트워크 스트림은 UDP/IP 위에서 원격 호스트에 의해 구독(subscribe) 됩니다. RTP와는 다르게, RTSP는 동적으로 스트림 특성(properties)들을 query 할 수 있습니다. (해상도나 코덱), 따라서 이와 같은 옵션들은 명시적으로 제공되지 않습니다.   
 
 ```bash
 $ video-viewer rtsp://<remote-ip>:1234 my_video.mp4      # subscribe to RTSP feed from <remote-ip>, port 1234 (and save it to file)
 $ video-viewer rtsp://username:password@<remote-ip>:1234 # with authentication (replace username/password with credentials)
 ```
 
-> **note:** RTSP is supported as an input only.  Outputting RTSP would require additional support in GStreamer for an RTSP server.
+> **note:** RTSP는 입력만으로 지원됩니다. RTSP를 출력하는 것은 RTSP 서버를 위한 GStreamer의 추가적인 지원이 필요합니다. 
 
 ## Video Files
 
-You can playback and record video files in MP4, MKV, AVI, and FLV formats.
+MP4, MKV, AVI, 그리고 FLV와 같은 포맷으로 플레이백하거나 저장할 수 있습니다.
 
 ```bash
 # playback
@@ -246,30 +246,30 @@ $ video-viewer /dev/video0 my_video.mp4                  # record V4L2 camera to
 
 #### Codecs
 
-When loading video files, the codec and resolution is automatically detected, so these don't need to be set.
-When saving video files, the default codec is H.264, but this can be set with the `--output-codec` option.
+비디오 파일을 불러올 때는 코덱과 해상도가 자동으로 검출되기 때문에 이를 설정할 필요가 없습니다.
+비디오 파일을 저장할 때 기본 코덱은 H.264입니다. 하지만 `--output-codec` 옵션으로 다른 코덱으로 설정할 수 있습니다.
 
 ```bash
 $ video-viewer --output-codec=h265 input.mp4 output.mp4  # transcode video to H.265
 ```
 
-The following codecs are supported:
+아래 코덱들이 지원됩니다.:
 
 * Decode - H.264, H.265, VP8, VP9, MPEG-2, MPEG-4, MJPEG
 * Encode - H.264, H.265, VP8, VP9, MJPEG
 
 
-#### Resizing Inputs
+#### Resizing Inputs(입력)
 
-When loading video files, the resolution is automatically detected.  However, if you would like the input video to be re-scaled to a different resolution, you can specify the `--input-width` and `--input-height` options:
+비디오 파일을 불러올 때 해상도가 자동으로 검출됩니다. 하지만 만약  re-scaled(사이즈를 바꾼) 다른 해상도를 갖는 입력을 원한다면 `--input-width` 와 `--input-height` 옵션을 사용할 수 있습니다.:
 
 ```bash
 $ video-viewer --input-width=640 --input-height=480 my_video.mp4  # resize video to 640x480
 ```
 
-#### Looping Inputs
+#### Looping Inputs(입력)
 
-By default, the video will terminate once the end of stream (EOS) is reached.  However, by specifying the `--loop` option, you can set the number of loops that you want the video to run for.  Possible options for `--loop` are:
+기본적으로 비디오는 EOS(스트림의 끝)(end of stream) 에 닿으면 종료되게 돼있습니다. 하지만 `--loop` 옵션을 사용하면 비디오를 반복 재생하고 싶은 수를 설정할 수 있습니다. 가능한 옵션은 다음과 같습니다.:
 
 * `-1` = loop forever
 * &nbsp;` 0` = don't loop (default)
@@ -280,9 +280,9 @@ $ video-viewer --loop=10 my_video.mp4    # loop the video 10 times
 $ video-viewer --loop=-1 my_video.mp4    # loop the video forever (until user quits)
 ```
 
-## Image Files
+## 이미지 파일 Image Files
 
-You can load/save image files in the following formats:
+다음과 같은 포맷으로 이미지를 불러오기/저장할 수 있습니다.:
 
 * Load:  JPG, PNG, TGA, BMP, GIF, PSD, HDR, PIC, and PNM (PPM/PGM binary)
 * Save:  JPG, PNG, TGA, BMP
@@ -291,27 +291,26 @@ You can load/save image files in the following formats:
 $ video-viewer input.jpg output.jpg	# load/save an image
 ```
 
-You can also loop images and image sequences - see the [Looping Inputs](#looping-inputs) section above.
+이미지, 연속된 이미지(image sequences) 또한 반복(loop)할 수 있습니다. 위 [Looping Inputs](#looping-inputs) 섹션을 보세요.
 
 #### Sequences
 
-If the path is a directory or contains wildcards, all of the images will be loaded/saved sequentially (in alphanumeric order).
+만약 경로(path)가 디렉토리거나 와일드카드를 포함한다면, 모든 이미지들이 연속적으로(sequentially) 불러오기/저장됩니다. (알파벳 순서대로)
 
 ```bash
 $ video-viewer input_dir/ output_dir/   # load all images from input_dir and save them to output_dir
 $ video-viewer "*.jpg" output_%i.jpg    # load all jpg images and save them to output_0.jpg, output_1.jpg, ect
 ```
 
-> **note:** when using wildcards, always enclose it in quotes (`"*.jpg"`). Otherwise, the OS will auto-expand the sequence and modify the order of arguments on the command-line, which may result in one of the input images being overwritten by the output.
+> **note:** 와일드 카드를 사용할 떄는 다음과 같이 쌍따옴표로 감싸야합니다. (`"*.jpg"`). 반면, OS는 해당 sequence를 자동으로 확장하고 커맨들 라인의 인자 순서를 수정합니다. 이로 인해 출력에 의해서 입력 이미지가 덮어씌워질 수 있습니다. 
 
-When saving a sequence of images, if the path is just to a directory (`output_dir`), then the images will automatically be saved as JPG with the format `output_dir/%i.jpg`, using the image number as it's filename (`output_dir/0.jpg`, `output_dir/1.jpg`, ect).  
+연속된 이미지를 저장할 때, 만약 경로가 디렉토리(`output_dir`) 로 돼있다면, 이미지는 자동으로 JPG으로 이미지 번호를 해당 이미지의 이름으로 하는 `output_dir/%i.jpg` 와 같은 포맷으로 저장됩니다. (`output_dir/0.jpg`, `output_dir/1.jpg`, ect).  
 
-If you wish to specify the filename format, do so by using the printf-style `%i` in the path (`output_dir/image_%i.png`).  You can apply additional printf modifiers such as `%04i` to create filenames like `output_dir/image_0001.jpg`.
+만약 파일 이름 포맷을 명시하고 싶다면, 경로 안에 (`output_dir/image_%i.png`) printf-style의 `%i` 를 사용하면 됩니다. 또한 `output_dir/image_0001.jpg` 같은 이미지 파일들을 생성하기 위해서 `%04i` 를 사용할 수도 있습니다.
 
+## 소스 코드
 
-## Source Code
-
-Streams are accessed using the [`videoSource`](https://github.com/dusty-nv/jetson-utils/tree/master/video/videoSource.h) and [`videoOutput`](https://github.com/dusty-nv/jetson-utils/tree/master/video/videoOutput.h) objects.  These have the ability to handle each of the types of streams from above through a unified set of APIs.  Images can be captured and output in the following data formats:  
+스트림들은 [`videoSource`](https://github.com/dusty-nv/jetson-utils/tree/master/video/videoSource.h) and [`videoOutput`](https://github.com/dusty-nv/jetson-utils/tree/master/video/videoOutput.h) 객체들을 사용하여 접근될 수 있습니다. 위의 하나의 통일된 API의 모음을 통해 이들은 각각의 스트림의 타입들을 다룰 수 있습니다. 이미지들은 다음과 같은 포맷들로 캡쳐나 출력될 수 있습니다.: 
 
 | Format string | [`imageFormat` enum](https://rawgit.com/dusty-nv/jetson-inference/dev/docs/html/group__imageFormat.html#ga931c48e08f361637d093355d64583406) | Data Type | Bit Depth |
 |---------------|------------------|-----------|-----------|
