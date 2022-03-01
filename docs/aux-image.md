@@ -1,5 +1,5 @@
 * Auth: 김준호
-* Data: 2022-02-23
+* Data: 2022-03-01
 
 <img src="https://github.com/dusty-nv/jetson-inference/raw/master/docs/images/deep-vision-header.jpg" width="100%">
 <p align="right"><sup><a href="aux-streaming.md">Back</a> | <a href="https://github.com/dusty-nv/ros_deep_learning">Next</a> | </sup><a href="../README.md#hello-ai-world"><sup>Contents</sup></a>
@@ -119,11 +119,11 @@ if( !cudaAllocMapped(&img, 1920, 1080) )
 	return false;	
 ```
 
-> **note:** when using these vector types, these images will be assumed to be in their respective RGB/RGBA colorspace.  So if you use `uchar3/uchar4/float3/float4` to represent an image that contains BGR/BGRA data, it could be intepreted by some processing functions as RGB/RGBA unless you explicitly specify the proper [image format](#image-formats).
+> **note:** 만약 위와 같은 벡터 타입을 사용한다면, 이러한 이미지들은 이들의 맞는 RGB/RGBA colorspace 로 가정됩니다. 그래서 만약 `uchar3/uchar4/float3/float4` BGR/BGRA 데이터를 포함하는 이미지를 나타내는 경우, 적절한 [image format](#image-formats)을 명시적으로 사용하지 않는다면 일부 처리 기능에 의해 RGB/RGBA로 입력될 수 있습니다.
 
-## Copying Images
+## 이미지 복사(copy)
 
-`cudaMemcpy()` can be used to copy memory between images of the same format and dimensions.  [`cudaMemcpy()`](https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html#group__CUDART__MEMORY_1gc263dbe6574220cc776b45438fc351e8) is a standard CUDA function in C++, and there is a similar version for Python in the jetson.utils library:
+`cudaMemcpy()` 는 같은 dimension과 포맷을 갖는 이미지 사이의 메모리를 복사할 때 이용될 수 있습니다. [`cudaMemcpy()`](https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__MEMORY.html#group__CUDART__MEMORY_1gc263dbe6574220cc776b45438fc351e8) 는 C++로 제공되는 표준 CUDA 함수이고, Python에서는 jetson.utils 라이브러리에서 같은 버전의 함수를 제공합니다. 
 
 #### Python
 ```python
@@ -164,9 +164,9 @@ if( CUDA_FAILED(cudaMemcpy(img_b, img_a, width * height * sizeof(uchar3), cudaMe
 	return false;  // memcpy error
 ```
 
-## Image Capsules in Python
+## Python에서의 이미지 캡슐(Image Capsules)
 
-When you allocate an image in Python, or capture an image from a video feed with [`videoSource.Capture()`](aux-streaming#source-code), it will return a self-contained memory capsule object (of type `<jetson.utils.cudaImage>`) that can be passed around without having to copy the underlying memory.  The `cudaImage` object has the following members:
+Python에서 이미지를 할당하거나 [`videoSource.Capture()`](aux-streaming#source-code)로 비디오 피드에서 이미지를 캡쳐해올 때, 이는 self-contained memory capsule 객체 (of type `<jetson.utils.cudaImage>`)를 반환합니다. self-contained memory capsule은 메모리를 복사할 필요가 없이 전달될 수 있습니다. 
 
 ```python
 <jetson.utils.cudaImage>
@@ -180,11 +180,11 @@ When you allocate an image in Python, or capture an image from a video feed with
   .mapped   # true if ZeroCopy
 ```
 
-So you can do things like `img.width` and `img.height` to access properties about the image.
+따라서 `img.width` 나 `img.height`를 사용하여 이미지의 properties에 접근할 수 있습니다.
 
-### Accessing Image Data in Python
+### Python에서의 이미지 데이터에 접근하기
 
-CUDA images are also subscriptable, meaning you can index them to directly access the pixel data from the CPU:
+CUDA 이미지들은 subscriptable 합니다. 이는 CPU에서 직접 pixel 데이터에 직접 접근하기 위해 인덱싱 할 수 있다는 의미입니다.:
 
 ```python
 for y in range(img.height):
@@ -193,42 +193,42 @@ for y in range(img.height):
 		img[y,x] = pixel    # set a pixel from a tuple (tuple length must match the number of channels)
 ```
 
-> **note:** the Python subscripting index operator is only available if the image was allocated in mapped ZeroCopy memory (i.e. by [`cudaAllocMapped()`](#image-allocation)).  Otherwise, the data is not accessible from the CPU, and an exception will be thrown. 
+> **note:** Python subscripting operator는 오직 이미지가 mapped ZeroCopy memory에 할당되었을 때만 이용가능 합니다 (i.e. by [`cudaAllocMapped()`](#image-allocation)). 그렇지 않으면, CPU에서는 접근할 수 없으며, exception이 throw됩니다.
 
-The indexing tuple used to access an image may take the following forms:
+이미지에 접근하기 위해 사용되는 인덱싱 튜플은 다음과 같은 폼을 따를 수 있습니다.:
 
 * `img[y,x]` - note the ordering of the `(y,x)` tuple, same as numpy
 * `img[y,x,channel]` - only access a particular channel (i.e. 0 for red, 1 for green, 2 for blue, 3 for alpha)
 * `img[y*img.width+x]` - flat 1D index, access all channels in that pixel
 
-Although image subscripting is supported, individually accessing each pixel of a large image isn't recommended to do from Python, as it will significantly slow down the application.  Assuming that a GPU implementation isn't available, a better alternative is to use Numpy.
+이미지 subscripting이 지원되더라도 큰 이미지에서 각각의 pixel에 접근하는 것은 python에서 권장되지 않습니다. 이는 어플리케이션을 굉장히 느려지게 만들기 때문입니다. GPU를 사용할 수 없다고 가정한다면 Numpy를 사용하는데 더 나은 대안입니다.
 
-### Converting to Numpy Arrays
+### Numpy Array로 변환
 
-You can access a `cudaImage` memory capsule from Numpy by calling `jetson.utils.cudaToNumpy()` on it first.  The underlying memory isn't copied and Numpy will access it directly - so be aware if you change the data in-place through Numpy, it will be changed in the `cudaImage` capsule as well.
+먼저 `jetson.utils.cudaToNumpy()`를 호출함으로써 `cudaImage` 메모리 캡슐에 Numpy로 접근할 수 있습니다. underlying 메모리는 복사되지 않고 Numpy에서 이에 직접 접근합니다. 따라서 Numpy에서 해당 데이터를 in-place(직접)로 바꾼다면, `cudaImage`에서도 바뀌게 됩니다.
 
-For an example of using `cudaToNumpy()`, see the [`cuda-to-numpy.py`](https://github.com/dusty-nv/jetson-utils/blob/master/python/examples/cuda-to-numpy.py) sample from jetson-utils.
+`cudaToNumpy()`를 사용한 예제를 원한다면, jetson-utils의 샘플 [`cuda-to-numpy.py`](https://github.com/dusty-nv/jetson-utils/blob/master/python/examples/cuda-to-numpy.py)을 보시길 바랍니다.
 
-Note that OpenCV expects images in BGR colorspace, so if you plan on using the image with OpenCV, you should call `cv2.cvtColor()` with `cv2.COLOR_RGB2BGR` before using it in OpenCV.
+OpenCV는 BGR colorspace를 원하기 때문에 만약 OpenCV를 사용하려면 `cv2.cvtColor()`함수를 `cv2.COLOR_RGB2BGR` 옵션과 함께 사용하여 OpenCV 함수를 적용하기 전에 colorspace를 바꾸어줘야합니다.
 
-### Converting from Numpy Arrays
+### Numpy array로 부터 변환하기
 
-Let's say you have an image in a Numpy ndarray, perhaps provided by OpenCV.  As a Numpy array, it will only be accessible from the CPU.  You can use `jetson.utils.cudaFromNumpy()` to copy it to the GPU (into shared CPU/GPU ZeroCopy memory).  
+Numpy의 ndarray로된 이미지가 있다고 해봅시다. 아마 OpenCV로 부터 주어졌겠죠? Numpy Array로는 오직 CPU에서 밖에 접근할 수 없습니다. 여기서 `jetson.utils.cudaFromNumpy()`를 사용하여 GPU에 이를 복사할 수 있습니다. (into shared CPU/GPU ZeroCopy memory).  
 
-For an example of using `cudaFromNumpy()`, see the [`cuda-from-numpy.py`](https://github.com/dusty-nv/jetson-utils/blob/master/python/examples/cuda-from-numpy.py) sample from jetson-utils.
+`cudaFromNumpy()`를 사용한 예제를 원한다면, jetson-utils의 예제인 [`cuda-from-numpy.py`](https://github.com/dusty-nv/jetson-utils/blob/master/python/examples/cuda-from-numpy.py)를 살펴보세요.
 
-Note that OpenCV images are in BGR colorspace, so if the image is coming from OpenCV, you should call `cv2.cvtColor()` with `cv2.COLOR_BGR2RGB` first.
 
-## Color Conversion
+## 색 변환(Color Conversion)
 
-The [`cudaConvertColor()`](https://github.com/dusty-nv/jetson-utils/tree/master/cuda/cudaColorspace.h) function uses the GPU to convert between image formats and colorspaces.  For example, you can convert from RGB to BGR (or vice versa), from YUV to RGB, RGB to grayscale, ect.  You can also change the data type and number of channels (e.g. RGB8 to RGBA32F).  For more info about the different formats available to convert between, see the [Image Formats](#image-formats) section above.
+[`cudaConvertColor()`](https://github.com/dusty-nv/jetson-utils/tree/master/cuda/cudaColorspace.h) 함수를 이미지의 포맷과 colorspace를 변환하기 위해 GPU를 사용합니다. 예로, RGB에서 BGR로 변환할 수도 있고(반대도 마찬가지) YUV에서 RGB로, RGB에서 Gray scale로도 바꿀 수 있습니다. 또한 데이터 타입과 채널의 수도 바꿀 수 있습니다. (e.g. RGB8 -> RGBA32F). 변환할 수 있는 더 많은 예를 원한다면 위 [Image Formats](#image-formats) 섹션을 확인하세요.
 
-[`cudaConvertColor()`](https://github.com/dusty-nv/jetson-utils/tree/master/cuda/cudaColorspace.h) has the following limitations and unsupported conversions:
-* The YUV formats don't support BGR/BGRA or grayscale (RGB/RGBA only)
-* YUV NV12, YUYV, YVYU, and UYVY can only be converted to RGB/RGBA (not from)
-* Bayer formats can only be converted to RGB8 (`uchar3`) and RGBA8 (`uchar4`)
+[`cudaConvertColor()`](https://github.com/dusty-nv/jetson-utils/tree/master/cuda/cudaColorspace.h)는 다음과 같은 지원하지 않는 변환과 한계가 있습니다.:
 
-The following Python/C++ psuedocode loads an image in RGB8, and convert it to RGBA32F (note that this is purely illustrative, since the image can be loaded directly as RGBA32F).  For a more comprehensive example, see [`cuda-examples.py`](https://github.com/dusty-nv/jetson-utils/tree/master/python/examples/cuda-examples.py).
+* YUV 포맷은 BGR/BGRA 포맷과 Grayscale을 지원하지 않습니다. (RGB/RGBA만 가능)
+* YUV NV12, YUYV, YVYU, UYVY는 오직 RGB/RGBA로만 변환 가능합니다. (반대는 아님)
+* Bayer 포맷은 오직 RGB8 (`uchar3`) 와 RGBA8 (`uchar4`) 로만 변환 가능합니다.
+
+다음 Python/C++ psuedocode는 RGB8로 이미지를 불러오고 이를 RGBA32F로 변환합니다. (이는 보여지기 위한 것이므로, 원래는 RGBA32F 포맷으로 바로 이미지를 불러올 수 있습니다.) 더 많은 예제를 위해서는 [`cuda-examples.py`](https://github.com/dusty-nv/jetson-utils/tree/master/python/examples/cuda-examples.py) 를 확인하세요.
 
 #### Python
 
@@ -271,9 +271,9 @@ if( CUDA_FAILED(cudaConvertColor(imgInput, IMAGE_RGB8, imgOutput, IMAGE_RGBA32F,
 	return false;	// an error or unsupported conversion occurred
 ```
 
-## Resizing
+## 리사이즈(Resizing)
 
-The [`cudaResize()`](https://github.com/dusty-nv/jetson-utils/tree/master/cuda/cudaResize.h) function uses the GPU to rescale images to a different size (either downsampled or upsampled).  The following Python/C++ psuedocode loads an image, and resizes it by a certain factor (downsampled by half in the example).  For a more comprehensive example, see [`cuda-examples.py`](https://github.com/dusty-nv/jetson-utils/tree/master/python/examples/cuda-examples.py).
+[`cudaResize()`](https://github.com/dusty-nv/jetson-utils/tree/master/cuda/cudaResize.h) 함수는 (다운샘플링이던 업샘플링이던)다른 크기로 이미지의 크기를 변환하기 위해 GPU를 사용합니다. 다음 Python/C++ psuedocode는 이미지를 불러오고 이를 특정한 비율로 resize합니다. 더 많은 예제를 위해선 [`cuda-examples.py`](https://github.com/dusty-nv/jetson-utils/tree/master/python/examples/cuda-examples.py)를 보세요.
 
 #### Python
 
@@ -322,11 +322,12 @@ if( CUDA_FAILED(cudaResize(imgInput, inputWidth, inputHeight, imgOutput, outputW
 	return false;
 ```
 
-## Cropping
+## 이미지 자르기(Cropping)
 
-The [`cudaCrop()`](https://github.com/dusty-nv/jetson-utils/tree/master/cuda/cudaCrop.h) function uses the GPU to crop an images to a particular region of interest (ROI).  The following Python/C++ psuedocode loads an image, and crops it around the center half of the image.  For a more comprehensive example, see [`cuda-examples.py`](https://github.com/dusty-nv/jetson-utils/tree/master/python/examples/cuda-examples.py).
+[`cudaCrop()`](https://github.com/dusty-nv/jetson-utils/tree/master/cuda/cudaCrop.h) 함수는 GPU를 사용하여 이미지를 특별한 region of interest(ROI)로 자릅니다. 다음 Python/C++ psudocode는 이미지를 불러오고, 중심을 기준으로 이미지를 반으로 자릅니다. 더 많은 예제를 위해서 다음을 보세요. [`cuda-examples.py`](https://github.com/dusty-nv/jetson-utils/tree/master/python/examples/cuda-examples.py).
 
-Note that the ROI rectangles are provided as `(left, top, right, bottom)` coordinates.
+
+여기서 ROI rectangles 은 `(left, top, right, bottom)` 좌표들로 제공됩니다.
 
 #### Python
 
@@ -388,13 +389,13 @@ if( CUDA_FAILED(cudaCrop(imgInput, imgOutput, crop_roi, inputWidth, inputHeight)
 	return false;
 ```
 
-## Normalization
+## 정규화(Normalization)
 
-The [`cudaNormalize()`](https://github.com/dusty-nv/jetson-utils/tree/master/cuda/cudaNormalize.h) function uses the GPU to change the range of pixel intensities in an image.  For example, convert an image with pixel values between `[0,1]` to have pixel values between `[0,255]`.  Another common range for pixel values is between `[-1,1]`.
+[`cudaNormalize()`](https://github.com/dusty-nv/jetson-utils/tree/master/cuda/cudaNormalize.h) 함수는 GPU를 사용하여 이미지의 픽셀값들의 범위를 바꿉니다. 예를 들어 `[0,255]` 사이의 픽셀값들을 가지고 있던 이미지를 `[0,1]` 의 픽셀값을 갖도록 변환합니다. 또 다른 자주 사용하는 범위로써 `[-1,1]`가 있습니다.
 
-> **note:** all of the other functions in jetson-inference and jetson-utils expect images with pixel ranges between `[0,255]`, so you wouldn't ordinarily need to use `cudaNormalize()`, but it is available in case you are working with data from an alternative source or destination.
+> **note:** jetson-inference, jetson-utils의 모든 함수들은 이미지의 pixel값이 `[0,255]` 사이에 있기를 기대합니다. 그래서 보통은 사용할 일이 없지만 다른 소스나 결과로 사용할 때 사용 가능합니다.  
 
-The following Python/C++ psuedocode loads an image, and normalizes it from `[0,255]` to `[0,1]`.
+아래 Python/C++ pseudocode는 이미지를 불러오고, 이를 `[0,255]` 에서 `[0,1]`로 정규화(Normalization)하는 예제입니다.
 
 #### Python
 
@@ -438,11 +439,11 @@ CUDA(cudaNormalize(imgInput, make_float2(0,255),
                    width, height));
 ```
 
-## Overlay
+## 오버레이(Overlay)
 
-The [`cudaOverlay()`](https://github.com/dusty-nv/jetson-utils/tree/master/cuda/cudaOverlay.h) function uses the GPU to compost an input image on top of an output image at a particular location.  Overlay operations are typically called in sequence to form a composite of multiple images together.
+[`cudaOverlay()`](https://github.com/dusty-nv/jetson-utils/tree/master/cuda/cudaOverlay.h) 함수는 GPU를 사용하여 출력 이미지 위에 특정한 위치에 입력 이미지를 합성합니다. 오버레이 연산들은 보통 여러 장의 이미지를 하나로 합칠 때 연속적으로 호출됩니다.
 
-The following Python/C++ psuedocode loads two images, and composts them together side-by-side in an output image.
+아래 Python/C++ pseudocode는 이미지를 불러오고 출력 이미지를 나란히 합성합니다.
 
 #### Python
 
@@ -497,11 +498,11 @@ CUDA(cudaOverlay(imgInputA, dimsA, imgOutput, dimsOutput, 0, 0));
 CUDA(cudaOverlay(imgInputB, dimsB, imgOutput, dimsOutput, dimsA.x, 0));
 ```
 
-## Drawing Shapes
+## 도형 그리기(Drawing Shapes)
 
-[`cudaDraw.h`](https://github.com/dusty-nv/jetson-utils/tree/master/cuda/cudaDraw.h) defines several functions for drawing basic shapes, including circles, lines, and rectangles.
+[`cudaDraw.h`](https://github.com/dusty-nv/jetson-utils/tree/master/cuda/cudaDraw.h) 에 기본 도형들, 예를 들어 원, 선, 네모들을 그리기 위한 함수들이 정의돼있습니다. 
 
-Below are simple Python and C++ psuedocode for using them - see [`cuda-examples.py`](https://github.com/dusty-nv/jetson-utils/tree/master/python/examples/cuda-examples.py) for a functioning example.
+아래 Python/C++ 예제 pseudocode들은 위 함수들을 이용한 것입니다. 다른 예제를 더 보고 싶다면 [`cuda-examples.py`](https://github.com/dusty-nv/jetson-utils/tree/master/python/examples/cuda-examples.py) 이를 확인하세요. 
 
 #### Python
 
